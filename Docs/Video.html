@@ -1,0 +1,57 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Video Module</title><style>body{font:16px/1.6 system-ui;max-width:1150px;margin:auto;padding:24px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #aaa;padding:8px;text-align:left}code{overflow-wrap:anywhere}</style></head><body><h1>Video Module</h1><p><a href="../../../../Docs/index.html">Appeal documentation</a> ? <a href="../README.md">Build and examples</a></p><p>Prefix commands below with <code>Video</code>. All listed arguments are required. Enabled accepts True/False, true/false, 1/0, or On/Off. Return values are available as Appeal expressions. Load an appropriate plugin before using the module.</p>
+<h2>Basic</h2><table><tr><th>Command</th><th>Arguments</th><th>Behavior</th></tr>
+<tr><td><code>Load</code></td><td><code>Name File</code></td><td>Decode a file under Video/Movies, an absolute file path, or a direct media URL. Returns 1/0; selects the named clip on success. Existing clips survive failure. Audio is enabled by default.</td></tr>
+<tr><td><code>Load_Video</code></td><td><code>Name File</code></td><td>Alias of Load.</td></tr>
+<tr><td><code>Use</code></td><td><code>Name</code></td><td>Select a loaded clip for no-argument playback controls; returns 1/0.</td></tr>
+<tr><td><code>Play</code></td><td><code></code></td><td>Start/resume the selected clip; replay an ended clip from the beginning.</td></tr>
+<tr><td><code>Pause</code></td><td><code></code></td><td>Pause video and its queued soundtrack at the current position.</td></tr>
+<tr><td><code>Stop</code></td><td><code></code></td><td>Stop the selected clip, flush its sound, and return to time zero.</td></tr>
+<tr><td><code>Play_Video</code></td><td><code>Name</code></td><td>Select and start a loaded clip.</td></tr>
+<tr><td><code>Play_Track</code></td><td><code>Track</code></td><td>Stop the current clip and play the 1-based loaded-order index; invalid indices throw.</td></tr>
+<tr><td><code>Next</code></td><td><code></code></td><td>Stop the current clip and play the next loaded clip, wrapping.</td></tr>
+<tr><td><code>Back</code></td><td><code></code></td><td>Stop the current clip and play the previous loaded clip, wrapping.</td></tr>
+<tr><td><code>Load_Play_List</code></td><td><code>File</code></td><td>Append named clips from a file relative to Video/Playlist. Each line is a quoted title followed by a movie-relative path or media URL. Returns 1/0; loading errors may leave successful entries available. The first loaded entry is selected.</td></tr>
+<tr><td><code>Clear_Play_List</code></td><td><code></code></td><td>Alias of Close_All: stop and release all loaded clips.</td></tr>
+<tr><td><code>Close</code></td><td><code>Name</code></td><td>Close one clip and release its video-owned texture, 2D drawable, and sound stream. Selects the first remaining clip if necessary.</td></tr>
+<tr><td><code>Close_All</code></td><td><code></code></td><td>Close all clips and release their resources. Safe repeatedly.</td></tr>
+<tr><td><code>Update</code></td><td><code></code></td><td>Call once per frame before Graphics Render. Advances every playing clip, uploads changed RGBA frames, and queues PCM into Audio. Returns 1/0 and updates Position and Is_Playing globals. Must run on the Graphics/context thread.</td></tr>
+<tr><td><code>Draw</code></td><td><code>Name X Y Width Height</code></td><td>Create/update a persistent 2D video rectangle in pixel coordinates; returns 1/0. Create a Graphics window first. Closing the clip removes this rectangle.</td></tr>
+<tr><td><code>Bind_Texture</code></td><td><code>Name Texture</code></td><td>Publish decoded frames under a chosen Graphics texture name instead of the default Video.Name. Then Graphics Set_Texture Asset Texture works for ordinary sprites and UV-mapped mesh surfaces. Video owns/releases this named texture, so choose a unique name.</td></tr>
+<tr><td><code>Get_Texture</code></td><td><code>Name</code></td><td>Return the video-owned Graphics texture name, or an empty string for an unknown clip.</td></tr>
+<tr><td><code>Audio_Output</code></td><td><code>Name Enabled</code></td><td>Enable/disable the clip soundtrack (True/False or 1/0). Disabled audio is drained silently; default True. Audio module controls overall music/video volume and mute.</td></tr>
+<tr><td><code>Seek</code></td><td><code>Seconds</code></td><td>Seek the selected clip, flushing old pictures/sound. Nonnegative seconds; returns 1/0. Preserves playing/paused state. Seeking depends on the input source.</td></tr>
+<tr><td><code>Set_Current_Loop</code></td><td><code>Enabled</code></td><td>Enable/disable repeating the selected clip; default False.</td></tr>
+<tr><td><code>Current_Looping</code></td><td><code></code></td><td>Return selected clip loop flag (1/0).</td></tr>
+<tr><td><code>Current_Video</code></td><td><code></code></td><td>Return the selected clip name, or an empty string.</td></tr>
+<tr><td><code>Is_Playing</code></td><td><code></code></td><td>Return whether the selected clip is playing (1/0).</td></tr>
+<tr><td><code>Position</code></td><td><code></code></td><td>Return current playback time in seconds.</td></tr>
+<tr><td><code>Duration</code></td><td><code></code></td><td>Return duration in seconds; 0 means unknown/live.</td></tr>
+<tr><td><code>Width</code></td><td><code></code></td><td>Return decoded video width in pixels.</td></tr>
+<tr><td><code>Height</code></td><td><code></code></td><td>Return decoded video height in pixels.</td></tr>
+<tr><td><code>Has_Audio</code></td><td><code></code></td><td>Return whether the source contains a decodable audio stream (1/0).</td></tr>
+<tr><td><code>Last_Error</code></td><td><code></code></td><td>Return the latest module or decoder diagnostic; normal success is an empty string. Update clears prior errors before advancing the decoder.</td></tr>
+<tr><td><code>Auto_Play_Next</code></td><td>Enabled</td><td>Enable automatic advancement to the next loaded clip at end-of-file; default False. The loaded order wraps, like Audio playlists.</td></tr><tr><td><code>Auto_Play_Next_Status</code></td><td></td><td>Return the automatic-advancement flag (1/0).</td></tr></table>
+<h2>Advanced</h2><table><tr><th>Command</th><th>Arguments</th><th>Behavior</th></tr>
+<tr><td><code>Set_Paths</code></td><td><code>Resources</code></td><td>Override the resource root; resets movie and playlist defaults to Resources/Video/Movies and Resources/Video/Playlist.</td></tr>
+<tr><td><code>Set_Playlist_Path</code></td><td><code>Path</code></td><td>Override only the playlist directory.</td></tr>
+<tr><td><code>Debug</code></td><td><code>Enabled</code></td><td>Enable/disable backend logging; default False.</td></tr>
+<tr><td><code>Info</code></td><td><code>Name Field</code></td><td>Return metadata without changing selection. Fields: Width, Height, Position, Duration, Is_Playing, Ended, Has_Audio, Looping. Unknown clip/field returns an empty string.</td></tr>
+</table>
+<h2>Globals</h2><p>Globals are typed string representations, read using Print_Global or Set_Var_Global. Defaults are seeded without querying a backend. Getters publish their result; other metadata fields are not eagerly polled. Close_All resets clip globals. Load does not automatically start playback.</p><table><tr><th>Name</th><th>Type</th><th>Default</th><th>Updated</th></tr>
+<tr><td><code>Video.Auto_Play_Next_Status</code></td><td>bool</td><td>0</td><td>Auto_Play_Next setter and status query.</td></tr><tr><td><code>Video.Current_Video</code></td><td>string</td><td>empty</td><td>Selection after Load, Use, or Close.</td></tr>
+<tr><td><code>Video.Texture</code></td><td>string</td><td>empty</td><td>Last Get_Texture result.</td></tr>
+<tr><td><code>Video.Info</code></td><td>string</td><td>empty</td><td>Last generic Info result.</td></tr>
+<tr><td><code>Video.Last_Error</code></td><td>string</td><td>empty</td><td>Latest error; empty after successful load or a successful update.</td></tr>
+<tr><td><code>Video.Loaded</code></td><td>bool</td><td>0</td><td>Last Load/Load_Video/Load_Play_List result.</td></tr>
+<tr><td><code>Video.Selected</code></td><td>bool</td><td>0</td><td>Last Use result.</td></tr>
+<tr><td><code>Video.Seeked</code></td><td>bool</td><td>0</td><td>Last Seek result.</td></tr>
+<tr><td><code>Video.Updated</code></td><td>bool</td><td>0</td><td>Last Update result.</td></tr>
+<tr><td><code>Video.Drawn</code></td><td>bool</td><td>0</td><td>Last Draw result.</td></tr>
+<tr><td><code>Video.Is_Playing</code></td><td>bool</td><td>0</td><td>Updated by playback commands, Update, or explicit query.</td></tr>
+<tr><td><code>Video.Has_Audio</code></td><td>bool</td><td>0</td><td>Last Has_Audio query.</td></tr>
+<tr><td><code>Video.Current_Looping</code></td><td>bool</td><td>0</td><td>Last Current_Looping query.</td></tr>
+<tr><td><code>Video.Width</code></td><td>int</td><td>0</td><td>Last Width query.</td></tr>
+<tr><td><code>Video.Height</code></td><td>int</td><td>0</td><td>Last Height query.</td></tr>
+<tr><td><code>Video.Position</code></td><td>double</td><td>0</td><td>Last Position query; also refreshed by Update.</td></tr>
+<tr><td><code>Video.Duration</code></td><td>double</td><td>0</td><td>Last Duration query.</td></tr>
+</table><h2>Backends and media output</h2><p>Test is an echoing diagnostic and copyable backend template; it does not decode or display real media. Appeal_FFmpeg_Video uses the FFmpeg shared libraries to demux/decode, convert to RGBA, and resample sound to stereo signed 16-bit PCM at 48 kHz. Graphics uploads frames into its normal named texture registry; Audio converts and mixes PCM on its own device and applies music volume/mute. Texture and audio integration use borrowed POD buffers; these bridge exports are native APIs, not script commands.</p><p>Call Video Update on the same thread as Graphics. Close clips before closing Graphics, or rely on normal reverse-order module cleanup. Audio may be disabled for silent/headless use. A compatible Graphics window is required for display; Audio must be loaded for sound. File I/O/decoding are synchronous and bounded per update; slow network reads can block up to their timeout. Multiple named clips may play together, with no promise of hardware acceleration.</p><h2>Current limits</h2><p>File playback and generated MP4, AVI, and WebM media are tested. Direct media URLs are passed to FFmpeg, not treated as web pages. Browser media-source APIs, DRM, website extraction, adaptive-stream UI, captions, HDR tone mapping, and display-rotation metadata are not implemented. Seeking requires a seekable input. Video uses a monotonic playback clock with a small decode/audio lookahead; this is basic synchronized playback, not audio-device-clock-locked production streaming.</p></body></html>

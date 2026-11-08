@@ -1,0 +1,4 @@
+*.dll
+*.so
+obj/
+Appeal_FFmpeg_Video/

@@ -1,0 +1,6 @@
+{
+  "release": "latest",
+  "asset": "ffmpeg-n8.1-latest-win64-lgpl-shared-8.1.zip",
+  "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n8.1-latest-win64-lgpl-shared-8.1.zip",
+  "sha256": "5566c69bb640c76627eecdd53f9586a7cb0d4cd42b58da9da249e470ba49111a"
+}
